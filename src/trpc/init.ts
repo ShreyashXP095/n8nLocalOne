@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth';
+import { polarClient } from '@/lib/polar';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { redirect } from 'next/dist/server/api-utils';
 import { headers } from 'next/headers';
@@ -32,4 +33,16 @@ export const protectedProcedure = baseProcedure.use(async ({ next, ctx }) => {
       throw new TRPCError({code: "UNAUTHORIZED" , message: "You are not authorized to perform this action"})
     }
     return next({ ctx: { ...ctx, auth: session } });
+});
+
+export const premimumProcedure = protectedProcedure.use(async ({next, ctx}) => {
+    const customer = await polarClient.customers.getStateExternal({
+        externalId: ctx.auth.user.id,
+    })
+    
+    if (!customer.activeSubscriptions || customer.activeSubscriptions.length === 0){
+        throw new TRPCError({code: "FORBIDDEN" ,
+           message: "You need a premium subscription to perform this action"})
+    }
+    return next({ ctx: { ...ctx, customer } });
 });
