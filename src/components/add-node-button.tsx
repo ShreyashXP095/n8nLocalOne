@@ -4,16 +4,23 @@ import { PlusIcon } from "lucide-react"
 import { memo } from "react";
 
 import { Button } from "./ui/button";
+import { NodeSelector } from "./node-selector";
+import { useState } from "react";
 
 export const AddNodeButton = memo(() =>{
+
+    const [selectorOpen, setSelectorOpen] = useState(false);
+
     return (
-        <Button onClick={()=>{}}
-        variant="outline"
-        size="icon"
-        className="bg-background"
-        >
-            <PlusIcon className="size-4"/>
-        </Button>
+        <NodeSelector open={selectorOpen} onOpenChange={setSelectorOpen}>
+            <Button onClick={()=>{}}
+            variant="outline"
+            size="icon"
+            className="bg-background"
+            >
+                <PlusIcon className="size-4"/>
+            </Button>
+        </NodeSelector>
     )
 })
 
