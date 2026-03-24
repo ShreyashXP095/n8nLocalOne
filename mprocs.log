@@ -10,3 +10,4 @@ ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodej
 ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run inngest:dev\0"` in cwd `Some("D:\\N8N LocalONe\\n8nlocalone\0")` failed: %1 is not a valid Win32 application. (os error 193)
 ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npm\" run dev\0"` in cwd `Some("D:\\N8N LocalONe\\n8nlocalone\0")` failed: %1 is not a valid Win32 application. (os error 193)
 ERROR [portable_pty::win::psuedocon] CreateProcessW `"\"C:\\Program Files\\nodejs\\npx\" -y inngest-cli@1.12.1 dev\0"` in cwd `Some("D:\\N8N LocalONe\\n8nlocalone\0")` failed: %1 is not a valid Win32 application. (os error 193)
+ERROR [lib::error] Error: channel closed

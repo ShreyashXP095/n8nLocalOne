@@ -4,6 +4,7 @@ import { Node, NodeProps , useReactFlow} from "@xyflow/react";
 import { GlobeIcon } from "lucide-react";
 import { memo, useState } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
+import { HttpRequestDialog } from "./dialog";
 
 type HttpRequestNodeData = {
     endpoint?: string;
@@ -15,22 +16,71 @@ type HttpRequestNodeData = {
 type HttpRequestNodeType = Node<HttpRequestNodeData>;
 
 export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
+
+    const [dialogOpen , setDialogOpen] = useState(false);
+    const { setNodes } = useReactFlow();
+
+    const nodeStatus = "initial";
+
+    const handleSubmit = (values: {
+        endpoint: string;
+        method: string;
+        body?: string;
+    }) => {
+        setNodes((prevNodes) =>
+        prevNodes.map((node) => {
+            if (node.id === props.id) {
+                return {
+                    ...node,
+                    data: {
+                        ...node.data,
+                        endpoint: values.endpoint,
+                        method: values.method,
+                        body: values.body,
+                    },
+                };
+            }
+            return node;
+        })
+        );
+    }
+
+    
+    const handleSettings = () => {
+        setDialogOpen(true);
+    }
+
+    const handleDoubleClick = () => {
+        setDialogOpen(true);
+    }
+
    const nodeData = props.data as HttpRequestNodeData;
    const description = nodeData?.endpoint 
    ? `${nodeData.method || "GET"} : ${nodeData.endpoint}`
    : "No endpoint configured";
 
+
    return (
     <>
+        <HttpRequestDialog
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            onSubmit={handleSubmit}
+            defaultEndpoint={nodeData.endpoint}
+            defaultMethod={nodeData.method}
+            defaultBody={nodeData.body}
+            />
         <BaseExecutionNode
          {...props}
           id={props.id}
+          status={nodeStatus}
           name={"HTTP Request"}
           description={description}
           icon={GlobeIcon}
-          onSettings={() => {}}
-          onDoubleClick={() => {}}
+          onSettings={handleSettings}
+          onDoubleClick={handleDoubleClick}
           />
+
             
     </>
    )
