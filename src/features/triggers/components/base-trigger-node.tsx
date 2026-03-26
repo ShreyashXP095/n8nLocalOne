@@ -13,7 +13,7 @@ import { NodeStatus, NodeStatusIndicator } from "@/components/react-flow/node-st
 interface BaseTriggerNodeProps extends NodeProps {
     icon: LucideIcon | string;
     name: string;
-    description: string;
+    description?: string;
     children?: ReactNode;
     status?: NodeStatus;
     onSettings: () => void;

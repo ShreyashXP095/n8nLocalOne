@@ -7,6 +7,7 @@ import { NodeType } from "@/generated/prisma/enums";
 import { getExecutor } from "@/features/executions/lib/executor-registry";
 import { httpRequestChannel } from "./channels/http-request";
 import { manualTriggerChannel } from "./channels/manual_trigger";
+import { googleFormTriggerChannel } from "./channels/google-form-trigger";
 
 
 export const executeWorkflow = inngest.createFunction(
@@ -14,7 +15,9 @@ export const executeWorkflow = inngest.createFunction(
     retries: 0, // TODO: Remove in production
    }, 
   { event: "workflows/execute.workflow",
-    channels: [httpRequestChannel,manualTriggerChannel],
+    channels: [httpRequestChannel,
+      manualTriggerChannel,
+      googleFormTriggerChannel],
    }, 
   async ({ event, step , publish}) => {
 
@@ -42,7 +45,7 @@ export const executeWorkflow = inngest.createFunction(
     });
 
     // intitalise the context with any intital data form the trigger
-    let context = event.data.intitalData || {};
+    let context = event.data.initialData || {};
 
     // execute each node
     for(const node of sortedNodes){
