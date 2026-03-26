@@ -5,7 +5,7 @@ import { z } from "zod";
 import { PAGINATION } from "@/config/constants";
 import { NodeType } from "@/generated/prisma/enums";
 import type { Node , Edge } from "@xyflow/react";
-import { inngest } from "@/inngest/client";
+import { sendWorkflowExecution } from "@/inngest/utils";
 
 
 export const workflowsRouter = createTRPCRouter({
@@ -21,16 +21,14 @@ export const workflowsRouter = createTRPCRouter({
         }
        });
 
-       await inngest.send({
-        name: "workflows/execute.workflow",
-        data: {
-          workflowId: input.id,
-        }
-       });
+       await sendWorkflowExecution({
+        workflowId: input.id,
+       })
 
 
        return workflow;
     }),
+
     create: premimumProcedure.mutation(({ctx}) => {
         return prisma.workflow.create({
             data: {
@@ -47,6 +45,7 @@ export const workflowsRouter = createTRPCRouter({
             }
         })
     }),
+
     remove: protectedProcedure
     .input(z.object({id: z.string()}))
     .mutation(({ctx, input}) => {
@@ -56,7 +55,8 @@ export const workflowsRouter = createTRPCRouter({
                 id: input.id,
             }
         })
-    }),
+    }), 
+
     update: protectedProcedure
     .input(
         z.object({
@@ -79,6 +79,7 @@ export const workflowsRouter = createTRPCRouter({
             ),
         })
     )
+
     .mutation(async ({ctx, input}) => {
         const {id, nodes, edges} = input;
 
@@ -128,6 +129,7 @@ export const workflowsRouter = createTRPCRouter({
              return workflow;
         })
     }),
+
     updateName: protectedProcedure
     .input(z.object({id: z.string(), name: z.string().min(1)}))
     .mutation(({ctx, input}) => {
@@ -141,6 +143,7 @@ export const workflowsRouter = createTRPCRouter({
             }
         })
     }),
+
     getOne: protectedProcedure
     .input(z.object({id: z.string()}))
     .query(async ({ctx, input}) => {
@@ -181,6 +184,7 @@ export const workflowsRouter = createTRPCRouter({
 
 
     }),
+    
     getMany: protectedProcedure
     .input(z.object({
         page: z.number().default(PAGINATION.DEFAULT_PAGE),
