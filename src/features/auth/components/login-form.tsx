@@ -27,7 +27,6 @@ import {
  } from "@/components/ui/form"
 
  import {Input} from "@/components/ui/input"
-//  import {authClient} from "@/lib/auth"
  import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
 
@@ -66,6 +65,35 @@ export function LoginForm(){
     );         
     }
 
+    const handleLoginGithub = async () =>{
+        await authClient.signIn.social({
+            provider: "github",
+            callbackURL: "/",
+        },{
+            onSuccess: () => {
+                toast.success("Logged in successfully");
+                router.push("/");
+            },
+            onError: (error) => {
+                toast.error(error.error?.message);
+            },
+        })
+    }
+    const handleLoginGoogle = async () =>{
+        await authClient.signIn.social({
+            provider: "google",
+            callbackURL: "/",
+        },{
+            onSuccess: () => {
+                toast.success("Logged in successfully");
+                router.push("/");
+            },
+            onError: (error) => {
+                toast.error(error.error?.message);
+            },
+        })
+    }
+
     const isPending = form.formState.isSubmitting;
     
     return (
@@ -87,6 +115,7 @@ export function LoginForm(){
                                  type="button"
                                  className="w-full"
                                  disabled={isPending}
+                                 onClick={handleLoginGithub}
                                  >
                                     <Image
                                     src="/logos/github.svg"
@@ -101,6 +130,7 @@ export function LoginForm(){
                                  type="button"
                                  className="w-full"
                                  disabled={isPending}
+                                 onClick={handleLoginGoogle}
                                  >
                                     <Image
                                     src="/logos/google.svg"

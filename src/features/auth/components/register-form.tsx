@@ -71,6 +71,34 @@ export function RegisterForm(){
         }
     )
     }
+    const handleLoginGithub = async () =>{
+            await authClient.signIn.social({
+                provider: "github",
+                callbackURL: "/",
+            },{
+                onSuccess: () => {
+                    toast.success("Logged in successfully");
+                    router.push("/");
+                },
+                onError: (error) => {
+                    toast.error(error.error?.message);
+                },
+            })
+        }
+        const handleLoginGoogle = async () =>{
+            await authClient.signIn.social({
+                provider: "google",
+                callbackURL: "/",
+            },{
+                onSuccess: () => {
+                    toast.success("Logged in successfully");
+                    router.push("/");
+                },
+                onError: (error) => {
+                    toast.error(error.error?.message);
+                },
+            })
+        }
 
     const isPending = form.formState.isSubmitting;
     
@@ -93,6 +121,7 @@ export function RegisterForm(){
                                  type="button"
                                  className="w-full"
                                  disabled={isPending}
+                                 onClick={handleLoginGithub}
                                  >
                                     <Image
                                     src="/logos/github.svg"
@@ -107,6 +136,7 @@ export function RegisterForm(){
                                  type="button"
                                  className="w-full"
                                  disabled={isPending}
+                                 onClick={handleLoginGoogle}
                                  >
                                     <Image
                                     src="/logos/google.svg"
