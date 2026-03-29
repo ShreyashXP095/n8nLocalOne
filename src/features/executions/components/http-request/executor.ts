@@ -13,9 +13,9 @@ Handlebars.registerHelper("json" , (context) => {
 })
 
 type HttpRequestData = {
-    variableName: string;
-    endpoint: string;
-    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    variableName?: string;
+    endpoint?: string;
+    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     body?: string;
 }
 
@@ -34,35 +34,35 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
         })
     )
 
-    if(!data.endpoint){
-        await publish(
-        httpRequestChannel().status({
-            nodeId,
-            status: "error",
-        })
-    )
-        throw new NonRetriableError("HTTP-Request: Endpoint is required");
-    }
-    if(!data.variableName){
-        await publish(
-        httpRequestChannel().status({
-            nodeId,
-            status: "error",
-        })
-    )
-        throw new NonRetriableError("HTTP-Request: Variable name is required");
-    }
-    if(!data.method){
-        await publish(
-        httpRequestChannel().status({
-            nodeId,
-            status: "error",
-        })
-    )
-        throw new NonRetriableError("HTTP-Request: Method is required");
-    }
     try{
-    const result = await step.run("http-request" , async () =>{
+        const result = await step.run("http-request" , async () =>{
+        if(!data.endpoint){
+            await publish(
+            httpRequestChannel().status({
+                nodeId,
+                status: "error",
+            })
+        )
+            throw new NonRetriableError("HTTP-Request: Endpoint is required");
+        }
+        if(!data.variableName){
+            await publish(
+            httpRequestChannel().status({
+                nodeId,
+                status: "error",
+            })
+        )
+            throw new NonRetriableError("HTTP-Request: Variable name is required");
+        }
+        if(!data.method){
+            await publish(
+            httpRequestChannel().status({
+                nodeId,
+                status: "error",
+            })
+        )
+            throw new NonRetriableError("HTTP-Request: Method is required");
+        }
         const endpoint = Handlebars.compile(data.endpoint)(context);
         const method = data.method ;
 
