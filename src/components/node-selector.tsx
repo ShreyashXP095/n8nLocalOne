@@ -69,6 +69,12 @@ const executionNodes: NodeTypeOption[] = [
         description: "Uses Groq to generate text",
         icon: "/logos/groq.svg",
     },
+    {
+        type: NodeType.OPENAI,
+        label: "OpenAI",
+        description: "Uses OpenAI GPT models to generate text",
+        icon: "/logos/openai.svg",
+    },
 ];
 
 interface NodeSelectorProps{
