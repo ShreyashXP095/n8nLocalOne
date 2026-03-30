@@ -71,8 +71,8 @@ export function LoginForm(){
             callbackURL: "/",
         },{
             onSuccess: () => {
-                toast.success("Logged in successfully");
                 router.push("/");
+                toast.success("Logged in successfully");
             },
             onError: (error) => {
                 toast.error(error.error?.message);
@@ -85,8 +85,8 @@ export function LoginForm(){
             callbackURL: "/",
         },{
             onSuccess: () => {
-                toast.success("Logged in successfully");
                 router.push("/");
+                toast.success("Logged in successfully");
             },
             onError: (error) => {
                 toast.error(error.error?.message);
