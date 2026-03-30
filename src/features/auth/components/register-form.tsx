@@ -77,8 +77,8 @@ export function RegisterForm(){
                 callbackURL: "/",
             },{
                 onSuccess: () => {
-                    toast.success("Logged in successfully");
                     router.push("/");
+                    toast.success("Signed Up successfully");
                 },
                 onError: (error) => {
                     toast.error(error.error?.message);
@@ -91,8 +91,8 @@ export function RegisterForm(){
                 callbackURL: "/",
             },{
                 onSuccess: () => {
-                    toast.success("Logged in successfully");
                     router.push("/");
+                    toast.success("Signed Up successfully");
                 },
                 onError: (error) => {
                     toast.error(error.error?.message);

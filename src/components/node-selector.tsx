@@ -57,6 +57,18 @@ const executionNodes: NodeTypeOption[] = [
         description: "Trigger the workflow via HTTP request",
         icon: GlobeIcon,
     },
+    {
+        type: NodeType.GEMINI,
+        label: "Gemini",
+        description: "Uses Google gemini to generate text",
+        icon: "/logos/gemini.svg",
+    },
+    {
+        type: NodeType.GROQ,
+        label: "Groq",
+        description: "Uses Groq to generate text",
+        icon: "/logos/groq.svg",
+    },
 ];
 
 interface NodeSelectorProps{
