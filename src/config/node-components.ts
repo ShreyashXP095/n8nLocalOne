@@ -8,6 +8,8 @@ import { ManualTriggerNode } from "@/features/triggers/components/manual-trigger
 import { StripeTriggerNode } from "@/features/triggers/components/stripe-trigger/node";
 import { NodeType } from "@/generated/prisma/enums";
 import { NodeTypes } from "@xyflow/react";
+import { DiscordNode } from "@/features/executions/components/discord/node";
+import { SlackNode } from "@/features/executions/components/slack/node";
 
 
 export const nodeComponents: NodeTypes = {
@@ -19,6 +21,8 @@ export const nodeComponents: NodeTypes = {
     [NodeType.STRIPE_TRIGGER]: StripeTriggerNode,
     [NodeType.GROQ]: GroqNode,
     [NodeType.OPENAI]: OpenAINode,
+    [NodeType.DISCORD]: DiscordNode,
+    [NodeType.SLACK]: SlackNode,
 } as const satisfies NodeTypes;
 
 
