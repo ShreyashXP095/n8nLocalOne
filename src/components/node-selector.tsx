@@ -75,6 +75,18 @@ const executionNodes: NodeTypeOption[] = [
         description: "Uses OpenAI GPT models to generate text",
         icon: "/logos/openai.svg",
     },
+    {
+        type: NodeType.DISCORD,
+        label: "Discord",
+        description: "Uses Discord to send messages",
+        icon: "/logos/discord.svg",
+    },
+    {
+        type: NodeType.SLACK,
+        label: "Slack",
+        description: "Uses Slack to send messages",
+        icon: "/logos/slack.svg",
+    },
 ];
 
 interface NodeSelectorProps{

@@ -119,6 +119,11 @@ enum NodeType{
   ANTHROPIC
   OPENAI
   GROQ
+  DISCORD
+  SLACK
+  WHATSAPP
+  TELEGRAM
+  GMAIL
 }
 
 model Node{

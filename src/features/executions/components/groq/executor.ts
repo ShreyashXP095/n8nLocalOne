@@ -25,6 +25,7 @@ type GroqData = {
 
 export const groqExecutor: NodeExecutor<GroqData> = async ({
     data,
+    userId,
     nodeId , 
     context , 
     step,
@@ -78,6 +79,7 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({
         return prisma.credential.findUnique({
             where: {
                 id: data.credentialId,
+                userId,
             },
         })
     })
