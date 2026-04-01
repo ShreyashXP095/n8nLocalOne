@@ -6,6 +6,7 @@ import { groqChannel } from "@/inngest/channels/groq";
 import { toast } from "sonner";
 import { generateText } from "ai";
 import { date } from "zod";
+import prisma from "@/lib/db";
 
 Handlebars.registerHelper("json" , (context) => {
     const strigified = JSON.stringify(context, null ,2);
@@ -19,6 +20,7 @@ type GroqData = {
     model?: string;
     systemPrompt?: string;
     userPrompt?: string;
+    credentialId?: string;
 }
 
 export const groqExecutor: NodeExecutor<GroqData> = async ({
@@ -45,6 +47,15 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({
         )
         throw new NonRetriableError("Variable name is required");
     }
+    if(!data.credentialId){
+        await publish(
+            groqChannel().status({
+                nodeId,
+                status: "error",
+            })
+        )
+        throw new NonRetriableError("Credential is required");
+    }
 
     if(!data.userPrompt){
         await publish(
@@ -62,9 +73,26 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({
 
     const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
-    // TODO: Fetch the credentials of the users
 
-    const credentialValue = process.env.GROQ_API_KEY!;
+    const credential = await step.run("get-credential" , () =>{
+        return prisma.credential.findUnique({
+            where: {
+                id: data.credentialId,
+            },
+        })
+    })
+
+    if(!credential){
+        await publish(
+            groqChannel().status({
+                nodeId,
+                status: "error",
+            })
+        )
+        throw new NonRetriableError("Credential not found");
+    }
+
+    const credentialValue = credential.value as string;
 
     const groq = createGroq({
         apiKey: credentialValue,

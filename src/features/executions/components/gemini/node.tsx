@@ -13,6 +13,7 @@ type GeminiNodeData = {
    model?: string;
    systemPrompt?: string;
    userPrompt?: string;
+   credentialId?: string;
 
 }
 
