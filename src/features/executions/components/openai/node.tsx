@@ -13,6 +13,7 @@ type OpenAINodeData = {
    model?: string;
    systemPrompt?: string;
    userPrompt?: string;
+   credentialId?: string;
 
 }
 
