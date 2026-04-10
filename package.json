@@ -88,6 +88,7 @@
   },
   "overrides": {
     "import-in-the-middle": "2.0.6",
-    "require-in-the-middle": "8.0.1"
+    "require-in-the-middle": "8.0.1",
+    "@types/pg": "$@types/pg"
   }
 }
