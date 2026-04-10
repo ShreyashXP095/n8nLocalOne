@@ -2,8 +2,11 @@ import {withSentryConfig} from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-   async redirects(){
+  outputFileTracingIncludes: {
+    // Include Prisma engine files for all API/server routes
+    "**": ["./src/generated/prisma/**"],
+  },
+  async redirects() {
     return [
       {
         source: "/",
@@ -11,7 +14,7 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
     ];
-   }
+  },
 };
 
 export default withSentryConfig(nextConfig, {
