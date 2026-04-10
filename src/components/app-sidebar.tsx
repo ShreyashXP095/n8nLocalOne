@@ -40,14 +40,14 @@ const menuItems = [
                 url: "/workflows"
             },
             {
-                title: "Executions",
-                icon: HistoryIcon,
-                url: "/executions"
-            },
-            {
                 title: "Credentials",
                 icon: KeyIcon,
                 url: "/credentials"
+            },
+            {
+                title: "Executions",
+                icon: HistoryIcon,
+                url: "/executions"
             },
             
             

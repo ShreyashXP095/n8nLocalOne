@@ -9,7 +9,6 @@ export const manualTriggerExecutor: NodeExecutor<ManualTriggerData> = async ({
     step,
     publish
 }) => {
-    // TODO: Publish "loading" state for manual trigger
     await publish(
         manualTriggerChannel().status({
             nodeId,

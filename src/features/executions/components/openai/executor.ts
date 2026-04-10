@@ -5,6 +5,7 @@ import Handlebars from "handlebars";
 import { openaiChannel } from "@/inngest/channels/openai";
 import { generateText } from "ai";
 import prisma from "@/lib/db";
+import { decrypt } from "@/lib/encryption";
 
 Handlebars.registerHelper("json" , (context) => {
     const strigified = JSON.stringify(context, null ,2);
@@ -72,7 +73,6 @@ export const openaiExecutor: NodeExecutor<OpenAIData> = async ({
 
     const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
-    // TODO: Fetch the credentials of the users
     const credential = await step.run("get-credential", () =>{
         return prisma.credential.findUnique({
             where: {
@@ -93,7 +93,7 @@ export const openaiExecutor: NodeExecutor<OpenAIData> = async ({
     }
 
 
-    const credentialValue = credential.value;
+    const credentialValue = decrypt(credential.value);
 
     const openai = createOpenAI({
         apiKey: credentialValue,

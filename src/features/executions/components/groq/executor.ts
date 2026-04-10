@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { generateText } from "ai";
 import { date } from "zod";
 import prisma from "@/lib/db";
+import { decrypt } from "@/lib/encryption";
 
 Handlebars.registerHelper("json" , (context) => {
     const strigified = JSON.stringify(context, null ,2);
@@ -31,7 +32,6 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({
     step,
     publish,
 }) => {
-    // TODO: Publish "loading" state for groq request
     await publish(
         groqChannel().status({
             nodeId,
@@ -94,7 +94,7 @@ export const groqExecutor: NodeExecutor<GroqData> = async ({
         throw new NonRetriableError("Credential not found");
     }
 
-    const credentialValue = credential.value as string;
+    const credentialValue = decrypt(credential.value);
 
     const groq = createGroq({
         apiKey: credentialValue,

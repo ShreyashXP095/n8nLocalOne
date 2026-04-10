@@ -26,7 +26,6 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
     step,
     publish,
 }) => {
-    // TODO: Publish "loading" state for http request
     await publish(
         httpRequestChannel().status({
             nodeId,

@@ -26,7 +26,6 @@ export const discordExecutor: NodeExecutor<DiscordData> = async ({
     step,
     publish,
 }) => {
-    // TODO: Publish "loading" state for gemini request
     await publish(
         discordChannel().status({
             nodeId,
