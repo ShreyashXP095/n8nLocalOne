@@ -6,6 +6,7 @@ import { geminiChannel } from "@/inngest/channels/gemini";
 import { toast } from "sonner";
 import { generateText } from "ai";
 import prisma from "@/lib/db";
+import { decrypt } from "@/lib/encryption";
 
 Handlebars.registerHelper("json" , (context) => {
     const strigified = JSON.stringify(context, null ,2);
@@ -30,7 +31,6 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
     step,
     publish,
 }) => {
-    // TODO: Publish "loading" state for gemini request
     await publish(
         geminiChannel().status({
             nodeId,
@@ -92,7 +92,7 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
         throw new NonRetriableError("Credential not found");
     }
 
-    const credentialValue = credential.value as string;
+    const credentialValue = decrypt(credential.value);
 
     const google = createGoogleGenerativeAI({
         apiKey: credentialValue,
