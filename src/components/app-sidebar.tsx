@@ -49,7 +49,11 @@ const menuItems = [
                 icon: HistoryIcon,
                 url: "/executions"
             },
-            
+            {
+                title: "Settings",
+                icon: SettingsIcon,
+                url: "/settings"
+            },
             
         ],
       
