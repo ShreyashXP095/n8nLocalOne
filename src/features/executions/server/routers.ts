@@ -36,6 +36,20 @@ export const executionsRouter = createTRPCRouter({
     .query(async ({ctx, input}) => {
         const {page, pageSize} = input;
 
+        // Mark stale RUNNING executions (started > 1 hour ago) as FAILED
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        await prisma.execution.updateMany({
+            where: {
+                workflow: { userId: ctx.auth.user.id },
+                status: "RUNNING",
+                startedAt: { lt: oneHourAgo },
+            },
+            data: {
+                status: "FAILED",
+                completedAt: new Date(),
+            },
+        });
+
         const [items , totalCount] = await Promise.all([
         prisma.execution.findMany({
             skip: (page - 1) * pageSize,

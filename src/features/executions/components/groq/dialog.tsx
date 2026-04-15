@@ -108,7 +108,7 @@ export const GroqDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent size="wide">
                 <DialogHeader>
                     <DialogTitle>Groq Configuration</DialogTitle>
                     <DialogDescription>
@@ -117,131 +117,145 @@ export const GroqDialog = ({
                 </DialogHeader>
                  <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)}
-                    className="space-y-8 mt-4"
+                    className="mt-4"
                     >
-                        <FormField
-                        control={form.control}
-                        name="variableName"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Variable Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="myGroq" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                   Use this name to reference the result in other nodes: {`{{${watchVariableName}.text}}`}
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                         <FormField
-                        control={form.control}
-                        name="credentialId"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Groq Credential</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingCredentials || credentials?.length === 0}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
+                            <div className="space-y-6">
+                                <FormField
+                                control={form.control}
+                                name="variableName"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Variable Name</FormLabel>
                                         <FormControl>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select a credential" />
-                                            </SelectTrigger>
+                                            <Input placeholder="myGroq" {...field} />
                                         </FormControl>
-                                            <SelectContent>
-                                                {credentials?.map((credential) => (
-                                                    <SelectItem key={credential.id} value={credential.id}>
-                                                        <div className="flex items-center gap-2">
-                                                            <Image
-                                                            src="/logos/groq.svg"
-                                                            alt={credential.name}
-                                                            width={16}
-                                                            height={16}
-                                                            />
-                                                        {credential.name}
-                                                        </div>
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                    </Select>
-                                <FormDescription>
-                                    Select the Credential to use.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                         <FormField
-                        control={form.control}
-                        name="model"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Model</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <FormDescription>
+                                           Use this name to reference the result in other nodes: {`{{${watchVariableName}.text}}`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                 <FormField
+                                control={form.control}
+                                name="credentialId"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Groq Credential</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingCredentials || credentials?.length === 0}>
+                                                <FormControl>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select a credential" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                    <SelectContent>
+                                                        {credentials?.map((credential) => (
+                                                            <SelectItem key={credential.id} value={credential.id}>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Image
+                                                                    src="/logos/groq.svg"
+                                                                    alt={credential.name}
+                                                                    width={16}
+                                                                    height={16}
+                                                                    />
+                                                                {credential.name}
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                            </Select>
+                                        <FormDescription>
+                                            Select the Credential to use.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                 <FormField
+                                control={form.control}
+                                name="model"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Model</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select a model" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                    <SelectContent>
+                                                        {AVAILABLE_MODELS.map((model) => (
+                                                            <SelectItem key={model} value={model}>
+                                                                {model}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                            </Select>
+                                        <FormDescription>
+                                           Select the AI model to use.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                {/* Faded logo watermark */}
+                                <div className="flex-1 flex items-center justify-center pt-4 opacity-[0.07]">
+                                    <Image
+                                    src="/logos/groq.svg"
+                                    alt=""
+                                    width={120}
+                                    height={120}
+                                    className="pointer-events-none select-none"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-6">
+                                <FormField
+                                    control={form.control}
+                                    name="systemPrompt"   
+                                    render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>System Prompt (Optional)</FormLabel>
                                         <FormControl>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select a model" />
-                                            </SelectTrigger>
+                                            <Textarea
+                                            className="min-h-[100px] font-mono text-sm"
+                                             placeholder= "You are a helpful assistant."
+                                             {...field} />
                                         </FormControl>
-                                            <SelectContent>
-                                                {AVAILABLE_MODELS.map((model) => (
-                                                    <SelectItem key={model} value={model}>
-                                                        {model}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                    </Select>
-                                <FormDescription>
-                                   Select the AI model to use.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="systemPrompt"   
-                            render={({field}) => (
-                            <FormItem>
-                                <FormLabel>System Prompt (Optional)</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                    className="min-h-[80px] font-mono text-sm"
-                                    
-                                     placeholder= "You are a helpful assistant."
-                                     {...field} />
-                                </FormControl>
-                                <FormDescription> 
-                                     Sets the behaviour of the assistant. Use {"{{variable}}"} {` `} 
-                                      for simple values or {"{{json variable}}"} {` `} 
-                                     to stringify objects.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="userPrompt"   
-                            render={({field}) => (
-                            <FormItem>
-                                <FormLabel>User Prompt (Required)</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                    className="min-h-[110px] font-mono text-sm"
-                                    
-                                     placeholder= "Summarize this text: {{json httpResponse.data}}"
-                                     {...field} />
-                                </FormControl>
-                                <FormDescription> 
-                                      The prompt to send to the AI . Use {"{{variable}}"} {` `} 
-                                      for simple values or {"{{json variable}}"} {` `} 
-                                     to stringify objects.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <DialogFooter className="mt-4">
+                                        <FormDescription> 
+                                             Sets the behaviour of the assistant. Use {"{{variable}}"} {` `} 
+                                              for simple values or {"{{json variable}}"} {` `} 
+                                             to stringify objects.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="userPrompt"   
+                                    render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>User Prompt (Required)</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                            className="min-h-[130px] font-mono text-sm"
+                                             placeholder= "Summarize this text: {{json httpResponse.data}}"
+                                             {...field} />
+                                        </FormControl>
+                                        <FormDescription> 
+                                              The prompt to send to the AI . Use {"{{variable}}"} {` `} 
+                                              for simple values or {"{{json variable}}"} {` `} 
+                                             to stringify objects.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                                 Cancel
                             </Button>

@@ -145,7 +145,7 @@ export const ExecutionView = ({
                             <p className="text-sm font-medium text-blue-900 mb-2">
                                 Output
                             </p>
-                            <pre className="text-sm font-mono overflow-auto">{JSON.stringify(execution.output, null, 2)}</pre>
+                            <pre className="text-sm font-mono overflow-auto max-h-96 p-2 bg-blue-100 rounded">{JSON.stringify(execution.output, null, 2)}</pre>
                         </div>
                     )}
             </CardContent>

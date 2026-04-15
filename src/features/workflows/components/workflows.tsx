@@ -2,16 +2,42 @@
 
 import { formatDistanceToNow } from "date-fns";
 
-import { EmptyView, EntityContainer, EntityHeader, EntityItem, EntityList, EntityPagination, EntitySearch, ErrorView, LoadingView } from "@/components/entity-components";
+import { EmptyView, EntityContainer, EntityGridItem, EntityHeader, EntityItem, EntityList, EntityPagination, EntitySearch, ErrorView, LoadingView, type ViewMode } from "@/components/entity-components";
 import { useCreateWorkflow, useRemoveWorkflow, useSuspenseWorkflows } from "../hooks/use-workflows"
-import { toast } from "sonner";
 import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
-import { router } from "better-auth/api";
 import { useRouter } from "next/navigation";
 import { useWorkflowsParams } from "../hooks/use-workflows-params";
 import { useEntitySearch } from "@/hooks/use-entity-search";
 import type { Workflow } from "@/generated/prisma/client";
 import { WorkflowIcon } from "lucide-react";
+import { atom, useAtom } from "jotai";
+import { useCallback } from "react";
+
+const VIEW_MODE_KEY = "nodeflow-workflows-view";
+
+function getInitialViewMode(): ViewMode {
+    if (typeof window === "undefined") return "grid";
+    try {
+        const stored = localStorage.getItem(VIEW_MODE_KEY);
+        if (stored === "list" || stored === "grid") return stored;
+    } catch {}
+    return "grid";
+}
+
+const viewModeAtom = atom<ViewMode>(getInitialViewMode());
+
+function useViewMode(): [ViewMode, (mode: ViewMode) => void] {
+    const [viewMode, setViewModeState] = useAtom(viewModeAtom);
+
+    const setViewMode = useCallback((mode: ViewMode) => {
+        setViewModeState(mode);
+        try {
+            localStorage.setItem(VIEW_MODE_KEY, mode);
+        } catch {}
+    }, [setViewModeState]);
+
+    return [viewMode, setViewMode];
+}
 
 export const WorkflowsSearch = () =>{
 
@@ -34,13 +60,19 @@ export const WorkflowsSearch = () =>{
 
 export const WorkflowsList = () =>{
     const workflows = useSuspenseWorkflows();
+    const [viewMode] = useViewMode();
 
    return (
     <EntityList
     items={workflows.data.items}
     getKey = {(workflow) => workflow.id}
+    viewMode={viewMode}
     renderItem={(workflow) => (
-        <WorkflowItem key={workflow.id} data={workflow} />
+        viewMode === "grid" ? (
+            <WorkflowGridItem key={workflow.id} data={workflow} />
+        ) : (
+            <WorkflowItem key={workflow.id} data={workflow} />
+        )
     )}
     emptyView={<WorkflowsEmpty />}
     />
@@ -95,11 +127,15 @@ export const WorkflowsPagination = () => {
     )
 }
 export const WorkflowsContainer = ({children} : {children: React.ReactNode}) => {
+    const [viewMode, setViewMode] = useViewMode();
+
     return (
        <EntityContainer 
        header = {<WorkflowsHeader />}
        search = {<WorkflowsSearch />}
        pagination = {<WorkflowsPagination />}
+       viewMode={viewMode}
+       onViewModeChange={setViewMode}
        >
         {children}
        </EntityContainer>
@@ -162,8 +198,6 @@ export const WorkflowItem = ({
         removeWorkflow.mutate({id: data.id})
     }
     return (
-
-
         <EntityItem
         key={data.id}
         href={`/workflows/${data.id}`}
@@ -179,6 +213,37 @@ export const WorkflowItem = ({
             <div className="size-8 flex items-center justify-center">
                 <WorkflowIcon className="size-5 text-muted-foreground" />
             </div>
+        }
+        onRemove={handleRemove}
+        isRemoving={removeWorkflow.isPending}
+        />
+    )
+}
+
+export const WorkflowGridItem = ({
+   data,
+}: {
+   data: Workflow
+}) => {
+    const removeWorkflow = useRemoveWorkflow();
+
+    const handleRemove = () => {
+        removeWorkflow.mutate({id: data.id})
+    }
+
+    return (
+        <EntityGridItem
+        href={`/workflows/${data.id}`}
+        title={data.name}
+        subtitle={
+            <>
+            Updated {formatDistanceToNow(data.updatedAt , {addSuffix: true})}{" "}
+            &bull; Created{" "}
+            {formatDistanceToNow(data.createdAt , {addSuffix: true})}
+            </>
+        }
+        image = {
+            <WorkflowIcon className="size-6 text-primary" />
         }
         onRemove={handleRemove}
         isRemoving={removeWorkflow.isPending}

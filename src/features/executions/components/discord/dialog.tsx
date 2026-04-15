@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -91,7 +92,7 @@ export const DiscordDialog = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent size="wide">
                 <DialogHeader>
                     <DialogTitle>Discord Configuration</DialogTitle>
                     <DialogDescription>
@@ -100,79 +101,94 @@ export const DiscordDialog = ({
                 </DialogHeader>
                  <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)}
-                    className="space-y-8 mt-4"
+                    className="mt-4 relative"
                     >
-                        <FormField
-                        control={form.control}
-                        name="variableName"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Variable Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="myDiscord" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                   Use this name to reference the result in other nodes: {`{{${watchVariableName}.text}}`}
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                         <FormField
-                        control={form.control}
-                        name="webhookUrl"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Webhook URL</FormLabel>
-                                 <FormControl>
-                                    <Input placeholder="https://discord.com/api/webhooks/..." {...field} />
-                                 </FormControl>
-                                 <FormDescription>
-                                    Get this from Discord: Channel Settings → Integrations → Webhooks → New Webhook
-                                 </FormDescription>
-                                <FormMessage /> 
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="content"   
-                            render={({field}) => (
-                            <FormItem>
-                                <FormLabel> Message Content</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                    className="min-h-[80px] font-mono text-sm"
-                                    
-                                     placeholder= "Summary: {{myGemini.text}}"
-                                     {...field} />
-                                </FormControl>
-                                <FormDescription> 
-                                     The message to send. Use {"{{variable}}"} {` `} 
-                                      for simple values or {"{{json variable}}"} {` `} 
-                                     to stringify objects.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                         <FormField
-                        control={form.control}
-                        name="username"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Bot Username (Optional)</FormLabel>
-                                 <FormControl>
-                                    <Input placeholder="Discord Bot" {...field} />
-                                 </FormControl>
-                                 <FormDescription>
-                                    The username to display for the bot.
-                                 </FormDescription>
-                                <FormMessage /> 
-                            </FormItem>
-                        )}
-                        />
-                        <DialogFooter className="mt-4">
+                        {/* Faded background watermark */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+                            <Image
+                            src="/logos/discord.svg"
+                            alt=""
+                            width={200}
+                            height={200}
+                            className="opacity-[0.04]"
+                            />
+                        </div>
+                        <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
+                            <div className="space-y-6">
+                                <FormField
+                                control={form.control}
+                                name="variableName"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Variable Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="myDiscord" {...field} />
+                                        </FormControl>
+                                        <FormDescription>
+                                           Use this name to reference the result in other nodes: {`{{${watchVariableName}.text}}`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                 <FormField
+                                control={form.control}
+                                name="webhookUrl"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Webhook URL</FormLabel>
+                                         <FormControl>
+                                            <Input placeholder="https://discord.com/api/webhooks/..." {...field} />
+                                         </FormControl>
+                                         <FormDescription>
+                                            Get this from Discord: Channel Settings → Integrations → Webhooks → New Webhook
+                                         </FormDescription>
+                                        <FormMessage /> 
+                                    </FormItem>
+                                )}
+                                />
+                                 <FormField
+                                control={form.control}
+                                name="username"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Bot Username (Optional)</FormLabel>
+                                         <FormControl>
+                                            <Input placeholder="Discord Bot" {...field} />
+                                         </FormControl>
+                                         <FormDescription>
+                                            The username to display for the bot.
+                                         </FormDescription>
+                                        <FormMessage /> 
+                                    </FormItem>
+                                )}
+                                />
+                            </div>
+                            <div className="space-y-6">
+                                <FormField
+                                    control={form.control}
+                                    name="content"   
+                                    render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Message Content</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                            className="min-h-[200px] font-mono text-sm"
+                                             placeholder= "Summary: {{myGemini.text}}"
+                                             {...field} />
+                                        </FormControl>
+                                        <FormDescription> 
+                                             The message to send. Use {"{{variable}}"} {` `} 
+                                              for simple values or {"{{json variable}}"} {` `} 
+                                             to stringify objects.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                                 Cancel
                             </Button>
