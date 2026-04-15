@@ -2,7 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 
-import { EmptyView, EntityContainer, EntityHeader, EntityItem, EntityList, EntityPagination, EntitySearch, ErrorView, LoadingView } from "@/components/entity-components";
+import { EmptyView, EntityContainer, EntityGridItem, EntityHeader, EntityItem, EntityList, EntityPagination, EntitySearch, ErrorView, LoadingView, type ViewMode } from "@/components/entity-components";
 import { useSuspenseExecutions } from "../hooks/use-executions"
 import { useRouter } from "next/navigation";
 import { useExecutionsParams } from "../hooks/use-executions-params";
@@ -11,19 +11,51 @@ import type { Execution } from "@/generated/prisma/browser";
 import { ExecutionStatus } from "@/generated/prisma/browser";
 import Image from "next/image";
 import { CheckCircle2Icon, ClockIcon, Loader2Icon, XCircleIcon } from "lucide-react";
+import { atom, useAtom } from "jotai";
+import { useCallback } from "react";
 
-                         
+const VIEW_MODE_KEY = "nodeflow-executions-view";
+
+function getInitialViewMode(): ViewMode {
+    if (typeof window === "undefined") return "grid";
+    try {
+        const stored = localStorage.getItem(VIEW_MODE_KEY);
+        if (stored === "list" || stored === "grid") return stored;
+    } catch {}
+    return "grid";
+}
+
+const viewModeAtom = atom<ViewMode>(getInitialViewMode());
+
+function useViewMode(): [ViewMode, (mode: ViewMode) => void] {
+    const [viewMode, setViewModeState] = useAtom(viewModeAtom);
+
+    const setViewMode = useCallback((mode: ViewMode) => {
+        setViewModeState(mode);
+        try {
+            localStorage.setItem(VIEW_MODE_KEY, mode);
+        } catch {}
+    }, [setViewModeState]);
+
+    return [viewMode, setViewMode];
+}
 
 
 export const ExecutionsList = () =>{
     const executions = useSuspenseExecutions();
+    const [viewMode] = useViewMode();
 
    return (
     <EntityList
     items={executions.data.items}
     getKey = {(execution) => execution.id}
+    viewMode={viewMode}
     renderItem={(execution) => (
-        <ExecutionItem key={execution.id} data={execution} />
+        viewMode === "grid" ? (
+            <ExecutionGridItem key={execution.id} data={execution} />
+        ) : (
+            <ExecutionItem key={execution.id} data={execution} />
+        )
     )}
     emptyView={<ExecutionsEmpty />}
     />
@@ -56,10 +88,14 @@ export const ExecutionsPagination = () => {
     )
 }
 export const ExecutionsContainer = ({children} : {children: React.ReactNode}) => {
+    const [viewMode, setViewMode] = useViewMode();
+
     return (
        <EntityContainer 
        header = {<ExecutionsHeader />} 
        pagination = {<ExecutionsPagination />}
+       viewMode={viewMode}
+       onViewModeChange={setViewMode}
        >
         {children}
        </EntityContainer>
@@ -106,35 +142,48 @@ const getStatusIcon = (status: ExecutionStatus) =>{
     }
 }
 
+const getStatusColor = (status: ExecutionStatus) =>{
+    switch(status){
+        case ExecutionStatus.SUCCESS:
+            return "from-green-500/15 via-green-500/8 to-emerald-500/10";
+        case ExecutionStatus.FAILED:
+            return "from-red-500/15 via-red-500/8 to-rose-500/10";
+        case ExecutionStatus.RUNNING:
+            return "from-blue-500/15 via-blue-500/8 to-indigo-500/10";
+        default:
+            return "from-primary/15 via-primary/8 to-accent/10";
+    }
+}
+
+type ExecutionWithWorkflow = Execution & {
+    workflow: {
+        id: string;
+        name: string;
+    }
+};
+
 export const ExecutionItem = ({
    data,
 }: {
-   data: Execution & {
-    workflow: {
-        id:string;
-        name:string;
-    }
-   }
+   data: ExecutionWithWorkflow
 }) => { 
 
     const duration = data.completedAt ?
     Math.round(
-        (new Date(data.completedAt).getTime() - new Date(data.startedAt).getTime()) / 1000
-    )
+        (new Date(data.completedAt).getTime() - new Date(data.startedAt).getTime()) / 60000 * 10
+    ) / 10
     :  null;
 
     const subtitle = (
         <>
         {data.workflow.name} &bull; Started{" "}
         {formatDistanceToNow(data.startedAt, {addSuffix: true})}
-        {duration !== null && ` • Took ${duration}s`}
+        {duration !== null && ` • Took ${duration}m`}
         </>
     )
    
 
     return (
-
-
         <EntityItem
         key={data.id}
         href={`/executions/${data.id}`}
@@ -145,6 +194,37 @@ export const ExecutionItem = ({
                 {getStatusIcon(data.status)}
             </div>
         }
+        />
+    )
+}
+
+export const ExecutionGridItem = ({
+   data,
+}: {
+   data: ExecutionWithWorkflow
+}) => { 
+
+    const duration = data.completedAt ?
+    Math.round(
+        (new Date(data.completedAt).getTime() - new Date(data.startedAt).getTime()) / 60000 * 10
+    ) / 10
+    :  null;
+
+    const subtitle = (
+        <>
+        {data.workflow.name} &bull; Started{" "}
+        {formatDistanceToNow(data.startedAt, {addSuffix: true})}
+        {duration !== null && ` • Took ${duration}m`}
+        </>
+    )
+
+    return (
+        <EntityGridItem
+        href={`/executions/${data.id}`}
+        title={data.status}
+        subtitle={subtitle}
+        image={getStatusIcon(data.status)}
+        className={`[&>div:first-child]:bg-gradient-to-br [&>div:first-child]:${getStatusColor(data.status)}`}
         />
     )
 }

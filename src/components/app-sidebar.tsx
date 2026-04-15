@@ -29,6 +29,7 @@ import {
 import { authClient } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscripions"
+import { AnimatedSidebarBackground } from "./animated-sidebar-background"
 
 const menuItems = [
     {
@@ -67,8 +68,9 @@ export const AppSidebar = () =>{
     const { hasActiveSubscription , isLoading } = useHasActiveSubscription();
 
     return (
-        <Sidebar collapsible="icon">
-            <SidebarHeader>
+        <Sidebar collapsible="icon" className="relative">
+            <AnimatedSidebarBackground className="group-data-[collapsible=icon]:hidden" />
+            <SidebarHeader className="z-10">
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild className="gap-x-4 h-10 px-4">
                         <Link href="/" prefetch>
@@ -79,7 +81,7 @@ export const AppSidebar = () =>{
 
                 </SidebarMenuItem>
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className="z-10">
                 {menuItems.map((group) =>(
                     <SidebarGroup key={group.title}>
                         <SidebarGroupContent>
@@ -107,7 +109,7 @@ export const AppSidebar = () =>{
                     </SidebarGroup>
                 ))}
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="z-10">
                 <SidebarMenu>
                         {!hasActiveSubscription && !isLoading && (
                         <SidebarMenuItem>

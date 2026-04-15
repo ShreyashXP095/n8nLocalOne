@@ -1,6 +1,6 @@
 "use client"
 
-import { AlertTriangleIcon, Loader2Icon, MoreVerticalIcon, PackageOpenIcon, PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
+import { AlertTriangleIcon, LayoutGridIcon, LayoutListIcon, Loader2Icon, MoreVerticalIcon, PackageOpenIcon, PlusIcon, SearchIcon, TrashIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Input } from "./ui/input";
@@ -82,11 +82,15 @@ export const EntityHeader = ({
     )
 }
 
+export type ViewMode = "list" | "grid";
+
 type EntityContainerProps = {
     header?: React.ReactNode;
     search?: React.ReactNode;
     pagination?: React.ReactNode;
     children: React.ReactNode;
+    viewMode?: ViewMode;
+    onViewModeChange?: (mode: ViewMode) => void;
 }
 
 
@@ -94,14 +98,40 @@ export const EntityContainer = ({
     header,
     search,
     pagination,
-    children
+    children,
+    viewMode,
+    onViewModeChange,
 }: EntityContainerProps) => {
     return (
         <div className="p-4 md:px-10 md:py-6 h-full">
             <div className="mx-auto max-w-7xl w-full flex flex-col h-full gap-y-8">
                 {header}
                 <div className="flex flex-col gap-y-4 h-full">
-                    {search}
+                    <div className="flex items-center gap-2">
+                        {viewMode && onViewModeChange && (
+                            <div className="flex items-center border border-border rounded-lg p-0.5">
+                                <Button
+                                    variant={viewMode === "list" ? "secondary" : "ghost"}
+                                    size="icon"
+                                    className="size-8"
+                                    onClick={() => onViewModeChange("list")}
+                                    aria-label="List view"
+                                >
+                                    <LayoutListIcon className="size-4" />
+                                </Button>
+                                <Button
+                                    variant={viewMode === "grid" ? "secondary" : "ghost"}
+                                    size="icon"
+                                    className="size-8"
+                                    onClick={() => onViewModeChange("grid")}
+                                    aria-label="Grid view"
+                                >
+                                    <LayoutGridIcon className="size-4" />
+                                </Button>
+                            </div>
+                        )}
+                        {search}
+                    </div>
                     {children}
                 </div>
                 {pagination}
@@ -249,6 +279,7 @@ interface EntityListProps<T>{
     getKey?: (item: T , index: number) => string | number;
     emptyView?: React.ReactNode;
     className?: string;
+    viewMode?: ViewMode;
 }
 
 export const EntityList = <T,>({
@@ -256,6 +287,7 @@ export const EntityList = <T,>({
     renderItem ,
     getKey , 
     emptyView , 
+    viewMode = "list",
     className}: EntityListProps<T>) => {
     if(items.length === 0 && emptyView){
         return (
@@ -268,7 +300,9 @@ export const EntityList = <T,>({
     }
     return (
         <div className={cn(
-            "flex flex-col gap-y-4",    
+            viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+                : "flex flex-col gap-y-4",    
             className
         )}>
             {items.map((item , index) => (
@@ -354,6 +388,84 @@ export const EntityItem = ({
                             )}
                         </div>
                     )}
+                </CardContent>
+            </Card>
+        </Link>
+    )
+}
+
+
+interface EntityGridItemProps{
+    href: string;
+    title: string;
+    subtitle?: React.ReactNode;
+    image?: React.ReactNode;
+    onRemove?: () => void | Promise<void>;
+    isRemoving?: boolean;
+    className?: string;
+}
+
+export const EntityGridItem = ({
+    href,
+    title,
+    subtitle,
+    image,
+    onRemove,
+    isRemoving,
+    className,
+}: EntityGridItemProps) => {
+
+    const handleRemove = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if(isRemoving) return ;
+
+        if(onRemove){
+            await onRemove();
+        }
+    }
+
+    return (
+        <Link href={href} prefetch>
+            <Card className={cn(
+                "p-0 shadow-none hover:shadow-md cursor-pointer transition-all duration-200 hover:scale-[1.02] overflow-hidden h-full group",
+                isRemoving && "opacity-50 cursor-not-allowed",
+                className
+            )}>
+                {/* Colored top accent bar */}
+                <div className="h-24 bg-gradient-to-br from-primary/15 via-primary/8 to-accent/10 flex items-center justify-center relative">
+                    <div className="size-12 rounded-xl bg-background/80 backdrop-blur-sm border border-border/50 flex items-center justify-center shadow-sm">
+                        {image}
+                    </div>
+                    {/* Kebab menu top-right */}
+                    {onRemove && (
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon"
+                                     className="size-7 bg-background/70 backdrop-blur-sm hover:bg-background"
+                                     disabled={isRemoving}
+                                     onClick={(e) => e.stopPropagation()}
+                                     >
+                                        <MoreVerticalIcon className="size-3.5" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end"
+                                 onClick={(e)=>e.stopPropagation()}
+                                >
+                                    <DropdownMenuItem onClick={handleRemove} disabled={isRemoving}>
+                                        <TrashIcon className="size-4 text-red-500" />
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    )}
+                </div>
+                <CardContent className="p-4">
+                    <CardTitle className="text-sm font-semibold truncate">{title}</CardTitle>
+                    {!!subtitle && <CardDescription className="text-xs mt-1 line-clamp-2">{subtitle}</CardDescription>}
                 </CardContent>
             </Card>
         </Link>
